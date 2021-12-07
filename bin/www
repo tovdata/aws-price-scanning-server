@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+const app = require('../app');
+const debug = require('debug')('aws-price-scanning-server');
+const http = require('http');
+
+// Get port from environment and store in express
+const PORT = normalizePort(process.env.PORT || "3000");
+app.set("port", PORT);
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Listen on provided port, on all network interfaces
+server.listen(PORT);
+// Event listener for HTTP server "error" event
+server.on("error", (err) => {
+  if (err.syscall !== "listen") throw err;
+
+  const bind = typeof PORT === "string" ? `Pipe ${PORT}` : `Port ${PORT}`;
+  // Handle specific listen errors with friendly messages
+  switch (err.code) {
+    case "EACCES":
+      console.error(`${bind} requires elevated privileges`);
+      process.exit(1);
+    case "EADDRINUSE":
+      console.error(`${bind} is already in use`);
+      process.exit(1);
+    default:
+      throw err;
+  }
+});
+// Event listener for HTTP server "listening" event
+server.on("listening", () => {
+  const addr = server.address();
+  const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr}`;
+  debug(`Listening on ${bind}`);
+});
+
+// Normalize a port into a number, string or false
+function normalizePort(value) {
+  const port = parseInt(value, 10);
+  // Return port
+  if (isNaN(port)) return value;
+  if (port >= 0) return port;
+  return false;
+}

@@ -1,0 +1,23 @@
+{
+  "name": "aws-price-scanning-server",
+  "version": "1.0.0",
+  "description": "a server that scans usage fees for aws services",
+  "main": "bin/www",
+  "scripts": {
+    "test": "node bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-hmin:tovdata/aws-price-scanning-server.git"
+  },
+  "author": "hmin",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "debug": "^4.3.3",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "http-errors": "^1.8.1",
+    "morgan": "^1.10.0"
+  }
+}
