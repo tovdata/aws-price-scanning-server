@@ -41,5 +41,63 @@ module.exports = {
       }
     }
     return { code: CODE.SUCCESS, message: "Successfully fetched pricing information for AWS services" };
+  },
+  /**
+   * Find price data by service
+   * @param {string} serviceCode aws service code (ex. AmazonEC2)
+   * @param {string} region aws region code (ex. ap-northeast-2)
+   * @param {string} productType product type (instance class or storage class)
+   * @param {string} operation operation code (ex. RunInstances, CreateDBInstances...)
+   * @returns {*} result format { code: number, message: string|object }
+   */
+  findByService: (serviceCode, region, productType, operation) => {
+    try {
+      // Check service code
+      if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
+      // Extract and return
+      let result = priceData[serviceCode][region];
+      if (result && productType) {
+        result = priceData[serviceCode][region][productType];
+        if (result && operation) {
+          result = priceData[serviceCode][region][productType].onDemand[operation];
+          if (result) {
+            return { code: CODE.SUCCESS, message: { product: priceData[serviceCode][region][productType].product, onDemand: result } };
+          } else {
+            return { code: CODE.ERROR.INVALID_OPERATION, message: {} };
+          }
+        } else if (result && operation === undefined) {
+          return { code: CODE.SUCCESS, message: result };
+        } else {
+          return { code: CODE.ERROR.INVALID_PRODUCT_TYPE, message: {} };
+        }
+      } else if (result && productType === undefined) {
+        return { code: CODE.SUCCESS, message: result };
+      } else {
+        return { code: CODE.ERROR.INVALID_REGION, message: {} };
+      }
+    } catch (err) {
+      return { code: CODE.ERROR.INTERAL_SERVER, message: err.message }
+    }
+  },
+  /**
+   * Get a list of product type by service and region
+   * @param {string} serviceCode aws service code (ex. AmazonEC2)
+   * @param {string} region aws region (ex. ap-northeast-2)
+   * @returns {*} result format { code: number, message: string|object }
+   */
+  getProductTypes: (serviceCode, region) => {
+    try {
+      // Check service code
+      if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
+      // Extract and return
+      const result = priceData[serviceCode][region];
+      if (result) {
+        return { code: CODE.SUCCESS, message: Object.keys(result) };
+      } else {
+        return { code: CODE.ERROR.INVALID_REGION, message: [] };
+      }
+    } catch (err) {
+      return { code: CODE.ERROR.INTERAL_SERVER, message: err.message };
+    }
   }
 }
