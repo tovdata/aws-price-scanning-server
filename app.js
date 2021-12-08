@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const price = require('./modules/price');
 // Get routes
 const indexRouter = require('./routes/index');
 // Create express application
@@ -26,5 +27,16 @@ app.use((err, req, res, next) => {
   // Render the error page
   res.status(err.status || 500).send(err);
 });
+
+// Initialization
+(async () => {
+  const result = await price.configure();
+  if (result.code !== 0) {
+    console.error(`[ERROR] ${result.message}`);
+    process.exit(result.code);
+  } else {
+    console.info(`[NOTICE] ${result.message}`);
+  }
+})();
 
 module.exports = app;

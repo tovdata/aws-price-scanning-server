@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const app = require('../app');
-const debug = require('debug')('aws-price-scanning-server');
+const debug = require('debug')('app:server');
 const http = require('http');
 
 // Get port from environment and store in express
@@ -32,7 +32,7 @@ server.on("error", (err) => {
 // Event listener for HTTP server "listening" event
 server.on("listening", () => {
   const addr = server.address();
-  const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr}`;
+  const bind = typeof addr === "string" ? `pipe ${addr}` : `${addr.address}${addr.port}`;
   debug(`Listening on ${bind}`);
 });
 
