@@ -39,57 +39,107 @@ function responseResult(res, result) {
 }
 
 /**
+ * @method POST
+ * @description Return the price data of aws dynamodb for region, instanceType, operation
+ */
+router.post('/update', async (req, res) => {
+  res.json(await price.update());
+});
+
+/**
  * @method GET
- * @desc Return the price data of aws ebs for region, instanceType, operation
+ * @description Return the price data of aws dynamodb for region, instanceType, operation
+ */
+ router.get('/dynamodb', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.findByService(SERVICE.DYNAMODB, req.query.region, req.query.productType, req.query.operation));
+});
+/**
+ * @method GET
+ * @description Return a list of usage type of aws dynamodb for region
+ */
+router.get('/dynamodb/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.getProductTypes(SERVICE.DYNAMODB, req.query.region));
+});
+/**
+ * @method GET
+ * @description Return the price data of aws ebs for region, instanceType, operation
  */
  router.get('/ebs', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.findByService(SERVICE.EBS, req.query.region, req.query.productType, "storage"));
 });
 /**
  * @method GET
- * @desc Return a list of valume type of aws ebs for region
+ * @description Return a list of valume type of aws ebs for region
  */
 router.get('/ebs/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.getProductTypes(SERVICE.EBS, req.query.region));
 });
 /**
  * @method GET
- * @desc Return the price data of aws ec2 for region, instanceType, operation
+ * @description Return the price data of aws ec2 for region, instanceType, operation
  */
 router.get('/ec2', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.findByService(SERVICE.EC2, req.query.region, req.query.productType, req.query.operation));
 });
 /**
  * @method GET
- * @desc Return a list of instance type of aws ec2 for region
+ * @description Return a list of instance type of aws ec2 for region
  */
 router.get('/ec2/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.getProductTypes(SERVICE.EC2, req.query.region));
 });
 /**
  * @method GET
- * @desc Return the price data of aws rds for region, instanceType, operation
+ * @description Return the price data of aws elb for region, instanceType, operation
+ */
+ router.get('/elb', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.findByService(SERVICE.ELB, req.query.region, req.query.productType, req.query.operation));
+});
+/**
+ * @method GET
+ * @description Return a list of product type of aws elb for region
+ */
+router.get('/elb/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.getProductTypes(SERVICE.ELB, req.query.region));
+});
+/**
+ * @method GET
+ * @description Return the price data of aws lambda for region, instanceType, operation
+ */
+ router.get('/lambda', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.findByService(SERVICE.LAMBDA, req.query.region, req.query.productType, req.query.operation));
+});
+/**
+ * @method GET
+ * @description Return a list of usage type of aws lambda for region
+ */
+router.get('/lambda/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, price.getProductTypes(SERVICE.LAMBDA, req.query.region));
+});
+/**
+ * @method GET
+ * @description Return the price data of aws rds for region, instanceType, operation
  */
  router.get('/rds', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.findByService(SERVICE.RDS, req.query.region, req.query.productType, req.query.operation));
 });
 /**
  * @method GET
- * @desc Return a list of instance type of aws rds for region
+ * @description Return a list of instance type of aws rds for region
  */
 router.get('/rds/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.getProductTypes(SERVICE.RDS, req.query.region));
 });
 /**
  * @method GET
- * @desc Return the price data of aws s3 for region, instanceType, operation
+ * @description Return the price data of aws s3 for region, instanceType, operation
  */
  router.get('/s3', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.findByService(SERVICE.S3, req.query.region, req.query.productType, "storage"));
 });
 /**
  * @method GET
- * @desc Return a list of storage class of aws s3 for region
+ * @description Return a list of storage class of aws s3 for region
  */
 router.get('/s3/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, price.getProductTypes(SERVICE.S3, req.query.region));

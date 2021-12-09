@@ -8,6 +8,7 @@ module.exports = {
       INVALID_SERVICE_CODE: 22,       // Invalid aws service code
       INVALID_PRODUCT_TYPE: 23,       // Invalid product type (ex. instance type, storage class ...)
       INVALID_OPERATION: 24,          // Invalid operation code (ex. RunInstances, CreateDBInstances, Storage...)
+      FAILED_SCAN: 30,                // Failed scan (to execute scanner)
       INTERAL_SERVER: 100,            // Internal server error
     },
     SUCCESS: 0
@@ -19,8 +20,10 @@ module.exports = {
     24: "This is an invalid operation code."
   },
   SERVICE: {
+    DYNAMODB: "AmazonDynamoDB",
     EBS: "AmazonEBS",
     EC2: "AmazonEC2",
+    ELB: "AWSELB",
     LAMBDA: "AWSLambda",
     RDS: "AmazonRDS",
     S3: "AmazonS3"

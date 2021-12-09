@@ -1,6 +1,8 @@
 const s3 = require('../aws/s3');
 // Result code
 const { CODE } = require('../models/model');
+// Logging
+const warnDbg = require('debug')('logger:warning');
 // Set global various
 const serviceList = {};
 const priceData = {};
@@ -19,11 +21,15 @@ module.exports = {
    * @returns {*} result format { code: number, message: string }
    */
   configure: async () => {
+    if (!process.env.region) {
+      process.env.region = "ap-northeast-2"
+    }
+
     // Configure an AWS S3
-    s3.configure("ap-northeast-2", "dev-hmin", {slDir: "aws-price-scanner", slFile: "serviceList.json", pdDir: "aws-price-scanner"});
+    s3.configure("dev-hmin", {slDir: "aws-price-scanner", slFile: "serviceList.json", pdDir: "aws-price-scanner"});
 
     // Load a list of service code
-    const result = await s3.getServiceList();
+    const result = await s3.loadServiceList();
     if (result.code === CODE.SUCCESS) {
       for (const serviceCode of result.message) {
         serviceList[serviceCode] = true;
@@ -33,14 +39,14 @@ module.exports = {
     }
     // Load a price data by service
     for (const serviceCode of Object.keys(serviceList)) {
-      const result = await s3.getPriceData(serviceCode);
+      const result = await s3.loadPriceData(serviceCode);
       if (result.code === CODE.SUCCESS) {
         priceData[serviceCode] = result.message;
       } else {
-        return { code: result.code, message: `Failed to load a price information for AWS service (service code: ${serviceCode})` };
+        warnDbg(`Code: ${result.code}, Message: Failed to load a price information for AWS service (service code: ${serviceCode})`);
       }
     }
-    return { code: CODE.SUCCESS, message: "Successfully fetched pricing information for AWS services" };
+    return { code: CODE.SUCCESS, message: "Successfully configure" };
   },
   /**
    * Find price data by service
@@ -99,5 +105,37 @@ module.exports = {
     } catch (err) {
       return { code: CODE.ERROR.INTERAL_SERVER, message: err.message };
     }
-  }
+  },
+  /**
+   * Get a list of service code
+   * @returns {Array<string>} list of service code
+   */
+  getServiceList: () => {
+    return Object.keys(serviceList);
+  },
+  /**
+   * Update a list of service code and price data for aws service
+   * @returns {*} result format { code: number, message: string }
+   */
+  update: async () => {
+    // Load a list of service code
+    const result = await s3.loadServiceList();
+    if (result.code === CODE.SUCCESS) {
+      for (const serviceCode of result.message) {
+        serviceList[serviceCode] = true;
+      }
+    } else {
+      return { code: result.code, message: "Not found a list of service code" };
+    }
+    // Load a price data by service
+    for (const serviceCode of Object.keys(serviceList)) {
+      const result = await s3.loadPriceData(serviceCode);
+      if (result.code === CODE.SUCCESS) {
+        priceData[serviceCode] = result.message;
+      } else {
+        warnDbg(`Code: ${result.code}, Message: Failed to load a price information for AWS service (service code: ${serviceCode})`);
+      }
+    }
+    return { code: CODE.SUCCESS, message: "Successfully update setting" };
+  },
 }

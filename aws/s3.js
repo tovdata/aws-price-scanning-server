@@ -13,17 +13,17 @@ module.exports = {
    * @param {string} bucket aws s3 bucket name
    * @param {*} dirSet directory name set in aws s3 bucket
    */
-  configure: (region, bucket, dirSet) => {
-    client = new S3Client({ region });
+  configure: (bucket, dirSet) => {
+    client = new S3Client({ region: process.env.region });
     // Set data
     gBucket = bucket;
     gDirSet = dirSet;
   },
   /**
-   * Get a list of service code
+   * Load a list of service code
    * @returns {*} result format { code: number, message: string|array }
    */
-  getServiceList: async () => {
+  loadServiceList: async () => {
     // Set input parameter
     const input = {
       Bucket: gBucket,
@@ -40,11 +40,11 @@ module.exports = {
     }
   },
   /**
-   * Get a price information by service
+   * Load a price information by service
    * @param {string} serviceCode aws service code (ex. AmazonEC2)
    * @returns {*} result format { code: number, message: string|array }
    */
-  getPriceData: async (serviceCode) => {
+  loadPriceData: async (serviceCode) => {
     // Set input parameter
     const input = {
       Bucket: gBucket,
