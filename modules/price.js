@@ -56,7 +56,8 @@ module.exports = {
    * @param {string} operation operation code (ex. RunInstances, CreateDBInstances...)
    * @returns {*} result format { code: number, message: string|object }
    */
-  findByService: (serviceCode, region, productType, operation) => {
+  findByService: (serviceCode, region, productType, serviceType, operation) => {
+    console.log(serviceCode, region, productType, serviceCode, operation);
     try {
       // Check service code
       if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
@@ -64,14 +65,21 @@ module.exports = {
       let result = priceData[serviceCode][region];
       if (result && productType) {
         result = priceData[serviceCode][region][productType];
-        if (result && operation) {
-          result = priceData[serviceCode][region][productType].onDemand[operation];
-          if (result) {
-            return { code: CODE.SUCCESS, message: { product: priceData[serviceCode][region][productType].product, onDemand: result } };
+        if (result && serviceType) {
+          result = priceData[serviceCode][region][productType][serviceType];
+          if (result && operation) {
+            result = priceData[serviceCode][region][productType][serviceType].onDemand[operation];
+            if (result) {
+              return { code: CODE.SUCCESS, message: { product: priceData[serviceCode][region][productType][serviceType].product, onDemand: result } };
+            } else {
+              return { code: CODE.ERROR.INVALID_OPERATION, message: {} };
+            }
+          } else if (result && operation === undefined) {
+            return { code: CODE.SUCCESS, message: result };
           } else {
-            return { code: CODE.ERROR.INVALID_OPERATION, message: {} };
+            return { code: CODE.ERROR.INVALID_SERVICE_TYPE, message: {} };
           }
-        } else if (result && operation === undefined) {
+        } else if (result && serviceType === undefined) {
           return { code: CODE.SUCCESS, message: result };
         } else {
           return { code: CODE.ERROR.INVALID_PRODUCT_TYPE, message: {} };
@@ -83,6 +91,21 @@ module.exports = {
       }
     } catch (err) {
       return { code: CODE.ERROR.INTERAL_SERVER, message: err.message }
+    }
+  },
+  /**
+   * Get a list of available region by service
+   * @param {string} serviceCode aws service code (ex. AmazonEC2)
+   * @returns {*} result format { code: number, message: string|object }
+   */
+  getAvailableRegionByService: (serviceCode) => {
+    try {
+      // Check service code
+      if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
+      // Extract and return
+      return { code: CODE.SUCCESS, message: Object.keys(priceData[serviceCode]) };
+    } catch (err) {
+      return { code: CODE.ERROR.INTERAL_SERVER, message: err.message };
     }
   },
   /**
@@ -112,6 +135,33 @@ module.exports = {
    */
   getServiceList: () => {
     return Object.keys(serviceList);
+  },
+  /**
+   * Get a list of service type by service and region
+   * @param {string} serviceCode aws service code (ex. AmazonEC2)
+   * @param {string} region aws region (ex. ap-northeast-2)
+   * @param {string} productType product type for service
+   * @returns {*} result format { code: number, message: string|object }
+   */
+  getServiceTypes: (serviceCode, region, productType) => {
+    try {
+      // Check service code
+      if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
+      // Extract and return
+      let result = priceData[serviceCode][region];
+      if (result) {
+        result = priceData[serviceCode][region][productType];
+        if (result) {
+          return { code: CODE.SUCCESS, message: Object.keys(result) };
+        } else {
+          return { code: CODE.ERROR.INVALID_PRODUCT_TYPE, message: [] };
+        }
+      } else {
+        return { code: CODE.ERROR.INVALID_REGION, message: [] };
+      }
+    } catch (err) {
+      return { code: CODE.ERROR.INTERAL_SERVER, message: err.message };
+    }
   },
   /**
    * Update a list of service code and price data for aws service

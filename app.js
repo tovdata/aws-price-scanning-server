@@ -5,6 +5,7 @@ const logger = require('morgan');
 const price = require('./modules/price');
 // Get routes
 const indexRouter = require('./routes/index');
+const infoRouter = require('./routes/info');
 const priceRouter = require('./routes/price');
 // Create express application
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // Set routes
 app.use('/', indexRouter);
+app.use('/info', infoRouter);
 app.use('/price', priceRouter);
 
 // Catch 404 and forward to error handler
