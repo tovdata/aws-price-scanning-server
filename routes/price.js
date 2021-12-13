@@ -11,7 +11,7 @@ const { checkParamForRegion, responseResult } = require('../modules/middleware')
  * @description Return the price data of aws dynamodb for region, instanceType, operation
  */
 router.put('/', async (req, res) => {
-  res.json(await price.update());
+  res.json(await updateData());
 });
 
 /**
