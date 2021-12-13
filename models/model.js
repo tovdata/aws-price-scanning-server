@@ -25,10 +25,12 @@ module.exports = {
     DYNAMODB: "AmazonDynamoDB",
     EBS: "AmazonEBS",
     EC2: "AmazonEC2",
+    ECS: "AmazonECS",
     EFS: "AmazonEFS",
     ELB: "AWSELB",
     LAMBDA: "AWSLambda",
     RDS: "AmazonRDS",
-    S3: "AmazonS3"
+    S3: "AmazonS3",
+    VPC: "AmazonVPC"
   }
 }

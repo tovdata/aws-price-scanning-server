@@ -26,7 +26,7 @@ router.get('/dynamodb', (req, res, next) => checkParamForRegion(req, res, next),
  * @description Return the price data of aws ebs for region, productType, serviceType, operation
  */
 router.get('/ebs', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
-  responseResult(res, findByService(SERVICE.EBS, req.query.region, req.query.productType, req.query.serviceType, "storage"));
+  responseResult(res, findByService(SERVICE.EBS, req.query.region, req.query.productType, req.query.serviceType, req.query.operation));
 });
 /**
  * @method GET
@@ -34,6 +34,13 @@ router.get('/ebs', (req, res, next) => checkParamForRegion(req, res, next), (req
  */
 router.get('/ec2', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, findByService(SERVICE.EC2, req.query.region, req.query.productType, req.query.serviceType, req.query.operation));
+});
+/**
+ * @method GET
+ * @description Return the price data of aws ecs for region, productType, serviceType, operation
+ */
+ router.get('/ecs', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, findByService(SERVICE.ECS, req.query.region, req.query.productType, req.query.serviceType, req.query.operation));
 });
 /**
  * @method GET
@@ -68,7 +75,14 @@ router.get('/rds', (req, res, next) => checkParamForRegion(req, res, next), (req
  * @description Return the price data of aws s3 for region, productType, serviceType, operation
  */
 router.get('/s3', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
-  responseResult(res, findByService(SERVICE.S3, req.query.region, req.query.productType, req.query.serviceType, "storage"));
+  responseResult(res, findByService(SERVICE.S3, req.query.region, req.query.productType, req.query.serviceType, req.query.operation));
+});
+/**
+ * @method GET
+ * @description Return the price data of aws vpc for region, productType, serviceType, operation
+ */
+ router.get('/vpc', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, findByService(SERVICE.VPC, req.query.region, req.query.productType, req.query.serviceType, req.query.operation));
 });
 
 module.exports = router;

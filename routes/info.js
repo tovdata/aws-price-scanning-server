@@ -74,6 +74,28 @@ const { checkParamForRegion, responseResult } = require('../modules/middleware')
 
 /**
  * @method GET
+ * @description Return a list of product type of aws ecs for region
+ */
+ router.get('/ecs/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, getProductTypes(SERVICE.ECS, req.query.region));
+});
+/**
+ * @method GET
+ * @description Return a list of available region of aws ecs
+ */
+ router.get('/ecs/regions', (req, res) => {
+  responseResult(res, getAvailableRegionByService(SERVICE.ECS));
+});
+/**
+ * @method GET
+ * @description Return a list of service type of aws ecs for region
+ */
+ router.get('/ecs/types', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, getServiceTypes(SERVICE.ECS, req.query.region, req.query.productType));
+});
+
+/**
+ * @method GET
  * @description Return a list of product type of aws efs for region
  */
  router.get('/efs/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
@@ -180,6 +202,28 @@ const { checkParamForRegion, responseResult } = require('../modules/middleware')
  */
  router.get('/s3/types', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
   responseResult(res, getServiceTypes(SERVICE.S3, req.query.region, req.query.productType));
+});
+
+/**
+ * @method GET
+ * @description Return a list of product type of aws vpc for region
+ */
+ router.get('/vpc/products', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, getProductTypes(SERVICE.VPC, req.query.region));
+});
+/**
+ * @method GET
+ * @description Return a list of available region of aws vpc
+ */
+ router.get('/vpc/regions', (req, res) => {
+  responseResult(res, getAvailableRegionByService(SERVICE.VPC));
+});
+/**
+ * @method GET
+ * @description Return a list of service type of aws vpc for region
+ */
+ router.get('/vpc/types', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
+  responseResult(res, getServiceTypes(SERVICE.VPC, req.query.region, req.query.productType));
 });
 
 module.exports = router;
