@@ -1,4 +1,5 @@
 const s3 = require('../aws/s3');
+const { updateServiceList } = require('../modules/scan');
 // Result code
 const { CODE } = require('../models/model');
 // Logging
@@ -57,7 +58,6 @@ module.exports = {
    * @returns {*} result format { code: number, message: string|object }
    */
   findByService: (serviceCode, region, productType, serviceType, operation) => {
-    console.log(serviceCode, region, productType, serviceCode, operation);
     try {
       // Check service code
       if (priceData[serviceCode] === undefined) return { code: CODE.ERROR.INVALID_SERVICE_CODE, message: {} };
@@ -167,16 +167,7 @@ module.exports = {
    * Update a list of service code and price data for aws service
    * @returns {*} result format { code: number, message: string }
    */
-  update: async () => {
-    // Load a list of service code
-    const result = await s3.loadServiceList();
-    if (result.code === CODE.SUCCESS) {
-      for (const serviceCode of result.message) {
-        serviceList[serviceCode] = true;
-      }
-    } else {
-      return { code: result.code, message: "Not found a list of service code" };
-    }
+  updateData: async () => {
     // Load a price data by service
     for (const serviceCode of Object.keys(serviceList)) {
       const result = await s3.loadPriceData(serviceCode);
@@ -188,4 +179,21 @@ module.exports = {
     }
     return { code: CODE.SUCCESS, message: "Successfully update setting" };
   },
+  /**
+   * Update a list of service code
+   * @returns {*} result format { code: number, message: string }
+   */
+  updateList: async () => {
+    // Load a list of service code
+    const result = await s3.loadServiceList();
+    if (result.code === CODE.SUCCESS) {
+      for (const serviceCode of result.message) {
+        serviceList[serviceCode] = true;
+      }
+      return { code: CODE.SUCCESS, message: "Successfully update list of AWS service code" };
+    } else {
+      warnDbg(`Code: ${result.code}, Message: Failed to update list of AWS service code`);
+      return { code: result.code, message: "Failed to update list of AWS service code" };
+    }
+  }
 }

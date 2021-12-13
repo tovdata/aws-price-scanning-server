@@ -3,14 +3,14 @@ const router = express.Router();
 // Model
 const { SERVICE } = require('../models/model');
 // Module
-const { findByService } = require('../modules/price');
+const { findByService, updateData } = require('../modules/price');
 const { checkParamForRegion, responseResult } = require('../modules/middleware');
 
 /**
- * @method POST
+ * @method PUT
  * @description Return the price data of aws dynamodb for region, instanceType, operation
  */
-router.post('/update', async (req, res) => {
+router.put('/', async (req, res) => {
   res.json(await price.update());
 });
 

@@ -3,8 +3,8 @@ const router = express.Router();
 // Result code
 const { CODE } = require('../models/model');
 // Module
-const { getServiceList } = require('../modules/price');
-const { scanning } = require('../modules/scan');
+const { getServiceList, updateList } = require('../modules/price');
+const { scanning, updateServiceList } = require('../modules/scan');
 // Logging
 const warnDbg = require('debug')('logger:warning');
 
@@ -22,6 +22,7 @@ router.get('/health', (req, res) => {
  */
 router.post('/scan', (req, res) => {
   const list = getServiceList();
+  console.log(list);
   list.forEach((serviceCode) => scanning(serviceCode));
   // Response
   res.json({ result: true, message: "Start the scan operation. The result can be checked through the log later." });
@@ -29,10 +30,23 @@ router.post('/scan', (req, res) => {
 
 /**
  * @method POST
+ * @description Scan price data for aws service using aws pricing sdk
+ */
+ router.post('/scan/list', async (req, res) => {
+  let result = await updateServiceList();
+  // Response
+  if (result.code === CODE.SUCCESS) {
+    res.json(await updateList());
+  } else {
+    res.json({ result: false, message: result.message });
+  }
+});
+
+/**
+ * @method POST
  * @description Scan price data for aws service using aws pricing sdk on a specific day
  */
 router.post('/scan/specific', (req, res) => {
-  console.log(req.body)
   if (req.body.date) {
     const now = new Date();
     const date = new Date(req.query.date);
