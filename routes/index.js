@@ -21,7 +21,7 @@ router.get('/health', (req, res) => {
  * @method PUT
  * @description Scan price data for aws service using aws pricing sdk
  */
-router.put('/scan', (req, res) => {
+router.put('/scan/all', (req, res) => {
   const list = getServiceList();
   list.forEach((serviceCode) => scanning(serviceCode));
   // Response
@@ -32,7 +32,7 @@ router.put('/scan', (req, res) => {
  * @method PUT
  * @description Scan price data for aws service
  */
-router.put('/scan/:service', (req, res) => {
+router.put('/scan/indiv/:service', (req, res) => {
   // Get service code
   const serviceCode = getServiceCodeForName(req.params.service);
   // Process
