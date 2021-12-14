@@ -15,7 +15,8 @@ module.exports = {
    * @returns {boolean} support result
    */
   checkTheServiceSupport: (serviceCode) => {
-    return serviceList[serviceCode] !== undefined ? true : false;
+    if (serviceCode === undefined || serviceCode === null || serviceCode === "none") return false;
+    else return serviceList[serviceCode] !== undefined ? true : false;
   },
   /**
    * Configuration
