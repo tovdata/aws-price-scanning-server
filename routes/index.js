@@ -3,8 +3,9 @@ const router = express.Router();
 // Result code
 const { CODE } = require('../models/model');
 // Module
-const { getServiceList, updateList } = require('../modules/price');
-const { scanning, updateServiceList } = require('../modules/scan');
+const { responseResult } = require('../modules/middleware');
+const { checkTheServiceSupport, getServiceList, getServiceCodeForName } = require('../modules/price');
+const { scanning } = require('../modules/scan');
 // Logging
 const warnDbg = require('debug')('logger:warning');
 
@@ -17,28 +18,30 @@ router.get('/health', (req, res) => {
 });
 
 /**
- * @method POST
+ * @method PUT
  * @description Scan price data for aws service using aws pricing sdk
  */
-router.post('/scan', (req, res) => {
+router.put('/scan', (req, res) => {
   const list = getServiceList();
-  console.log(list);
   list.forEach((serviceCode) => scanning(serviceCode));
   // Response
   res.json({ result: true, message: "Start the scan operation. The result can be checked through the log later." });
 });
 
 /**
- * @method POST
- * @description Scan price data for aws service using aws pricing sdk
+ * @method PUT
+ * @description Scan price data for aws service
  */
- router.post('/scan/list', async (req, res) => {
-  let result = await updateServiceList();
-  // Response
-  if (result.code === CODE.SUCCESS) {
-    res.json(await updateList());
+router.put('/scan/:service', (req, res) => {
+  // Get service code
+  const serviceCode = getServiceCodeForName(req.params.service);
+  // Process
+  if (checkTheServiceSupport(serviceCode)) {
+    scanning(serviceCode);
+    // Return
+    res.json({ result: true, message: "Start the scan operation. The result can be checked through the log later." });
   } else {
-    res.json({ result: false, message: result.message });
+    responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
   }
 });
 

@@ -3,154 +3,64 @@ const router = express.Router();
 // Model
 const { CODE, SERVICE } = require('../models/model');
 // Module
-const { checkTheServiceSupport, getProductTypes, getServiceTypes, getAvailableRegionByService } = require('../modules/price');
+const { checkTheServiceSupportByName, getProductTypes, getServiceList, getServiceTypes, getAvailableRegionByService, updateData, updateList } = require('../modules/price');
 const { checkParamForRegion, responseResult } = require('../modules/middleware');
+const { updateServiceList } = require('../modules/scan');
 
 /**
  * @method GET
  * @description Return a list of product type of aws service for region
  */
 router.get('/products/:service', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
-  // Set service code
-  let serviceCode = null;
-  switch (req.params.service) {
-    case "dynamodb":
-      serviceCode = SERVICE.DYNAMODB;
-      break;
-    case "ebs":
-      serviceCode = SERVICE.EBS;
-      break;
-    case "ec2":
-      serviceCode = SERVICE.EC2;
-      break;
-    case "ecs":
-      serviceCode = SERVICE.ECS;
-      break;
-    case "efs":
-      serviceCode = SERVICE.EFS;
-      break;
-    case "elb":
-      serviceCode = SERVICE.ELB;
-      break;
-    case "lambda":
-      serviceCode = SERVICE.LAMBDA;
-      break;
-    case "rds":
-      serviceCode = SERVICE.RDS;
-      break;
-    case "s3":
-      serviceCode = SERVICE.S3;
-      break;
-    case "vpc":
-      serviceCode = SERVICE.VPC;
-      break;
-    default:
-      serviceCode = "none";
-      break;
-  }
-  // Check service code and process
-  if (checkTheServiceSupport(serviceCode)) {
+  if (checkTheServiceSupportByName(req.params.service)) {
     responseResult(res, getProductTypes(serviceCode, req.query.region));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
   }
 });
+
 /**
  * @method GET
  * @description Return a list of regions of aws service for region
  */
- router.get('/regions/:service', (req, res) => {
-  // Set service code
-  let serviceCode = null;
-  switch (req.params.service) {
-    case "dynamodb":
-      serviceCode = SERVICE.DYNAMODB;
-      break;
-    case "ebs":
-      serviceCode = SERVICE.EBS;
-      break;
-    case "ec2":
-      serviceCode = SERVICE.EC2;
-      break;
-    case "ecs":
-      serviceCode = SERVICE.ECS;
-      break;
-    case "efs":
-      serviceCode = SERVICE.EFS;
-      break;
-    case "elb":
-      serviceCode = SERVICE.ELB;
-      break;
-    case "lambda":
-      serviceCode = SERVICE.LAMBDA;
-      break;
-    case "rds":
-      serviceCode = SERVICE.RDS;
-      break;
-    case "s3":
-      serviceCode = SERVICE.S3;
-      break;
-    case "vpc":
-      serviceCode = SERVICE.VPC;
-      break;
-    default:
-      serviceCode = "none";
-      break;
-  }
-  // Check service code and process
-  if (checkTheServiceSupport(serviceCode)) {
+router.get('/regions/:service', (req, res) => {
+  if (checkTheServiceSupportByName(req.params.service)) {
     responseResult(res, getAvailableRegionByService(serviceCode));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
   }
 });
+
 /**
  * @method GET
  * @description Return a list of service type of aws service for region and product type
  */
- router.get('/types/:service', (req, res) => {
-  // Set service code
-  let serviceCode = null;
-  switch (req.params.service) {
-    case "dynamodb":
-      serviceCode = SERVICE.DYNAMODB;
-      break;
-    case "ebs":
-      serviceCode = SERVICE.EBS;
-      break;
-    case "ec2":
-      serviceCode = SERVICE.EC2;
-      break;
-    case "ecs":
-      serviceCode = SERVICE.ECS;
-      break;
-    case "efs":
-      serviceCode = SERVICE.EFS;
-      break;
-    case "elb":
-      serviceCode = SERVICE.ELB;
-      break;
-    case "lambda":
-      serviceCode = SERVICE.LAMBDA;
-      break;
-    case "rds":
-      serviceCode = SERVICE.RDS;
-      break;
-    case "s3":
-      serviceCode = SERVICE.S3;
-      break;
-    case "vpc":
-      serviceCode = SERVICE.VPC;
-      break;
-    default:
-      serviceCode = "none";
-      break;
-  }
-  // Check service code and process
-  if (checkTheServiceSupport(serviceCode)) {
+router.get('/types/:service', (req, res) => {
+  if (checkTheServiceSupportByName(req.params.service)) {
     responseResult(res, getServiceTypes(serviceCode, req.query.region, req.query.productType));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
+  }
+});
+
+/**
+ * @method GET
+ * @description Return a list of aws service code
+ */
+router.get('/service/list', (req, res) => {
+  res.json({ result: true, message: getServiceList() });
+});
+
+/**
+ * @method PUT
+ * @description Update a list of aws service code
+ */
+router.put('/service/list', async (req, res) => {
+  const result = await updateServiceList();
+  if (result.code === CODE.SUCCESS) {
+    res.json(await updateList());
+  } else {
+    res.json({ result: false, message: result.message });
   }
 });
 

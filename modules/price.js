@@ -1,7 +1,6 @@
 const s3 = require('../aws/s3');
-const { updateServiceList } = require('../modules/scan');
 // Result code
-const { CODE } = require('../models/model');
+const { CODE, SERVICE } = require('../models/model');
 // Logging
 const warnDbg = require('debug')('logger:warning');
 // Set global various
@@ -14,7 +13,7 @@ module.exports = {
    * @param {string} serviceCode aws service code (ex. AmazonEC2)
    * @returns {boolean} support result
    */
-  checkTheServiceSupport: (serviceCode) => {
+   checkTheServiceSupport: (serviceCode) => {
     if (serviceCode === undefined || serviceCode === null || serviceCode === "none") return false;
     else return serviceList[serviceCode] !== undefined ? true : false;
   },
@@ -128,6 +127,37 @@ module.exports = {
       }
     } catch (err) {
       return { code: CODE.ERROR.INTERAL_SERVER, message: err.message };
+    }
+  },
+  /**
+   * Check the service support
+   * @param {string} serviceName service name (ex. ec2, ebs, efs)
+   * @returns {boolean} support result
+   */
+  getServiceCodeForName: (serviceName) => {
+    switch (serviceName) {
+      case "dynamodb":
+        return SERVICE.DYNAMODB;
+      case "ebs":
+        return SERVICE.EBS;
+      case "ec2":
+        return SERVICE.EC2;
+      case "ecs":
+        return SERVICE.ECS;
+      case "efs":
+        return SERVICE.EFS;
+      case "elb":
+        return SERVICE.ELB;
+      case "lambda":
+        return SERVICE.LAMBDA;
+      case "rds":
+        return SERVICE.RDS;
+      case "s3":
+        return SERVICE.S3;
+      case "vpc":
+        return SERVICE.VPC;
+      default:
+        return "none";
     }
   },
   /**
