@@ -13,7 +13,7 @@ module.exports = {
    * @param {string} serviceCode aws service code (ex. AmazonEC2)
    * @returns {boolean} support result
    */
-   checkTheServiceSupport: (serviceCode) => {
+  checkTheServiceSupport: (serviceCode) => {
     if (serviceCode === undefined || serviceCode === null || serviceCode === "none") return false;
     else return serviceList[serviceCode] !== undefined ? true : false;
   },

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 // Model
-const { CODE, SERVICE } = require('../models/model');
+const { CODE } = require('../models/model');
 // Module
-const { checkTheServiceSupportByName, getProductTypes, getServiceList, getServiceTypes, getAvailableRegionByService, updateData, updateList } = require('../modules/price');
+const { checkTheServiceSupport, getServiceCodeForName, getServiceList, getServiceTypes } = require('../modules/price');
+const { getProductTypes, getAvailableRegionByService, updateList } = require('../modules/price');
 const { checkParamForRegion, responseResult } = require('../modules/middleware');
 const { updateServiceList } = require('../modules/scan');
 
@@ -12,7 +13,10 @@ const { updateServiceList } = require('../modules/scan');
  * @description Return a list of product type of aws service for region
  */
 router.get('/products/:service', (req, res, next) => checkParamForRegion(req, res, next), (req, res) => {
-  if (checkTheServiceSupportByName(req.params.service)) {
+  // Get service code
+  const serviceCode = getServiceCodeForName(req.params.service);
+  // Process
+  if (checkTheServiceSupport(serviceCode)) {
     responseResult(res, getProductTypes(serviceCode, req.query.region));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
@@ -24,7 +28,10 @@ router.get('/products/:service', (req, res, next) => checkParamForRegion(req, re
  * @description Return a list of regions of aws service for region
  */
 router.get('/regions/:service', (req, res) => {
-  if (checkTheServiceSupportByName(req.params.service)) {
+  // Get service code
+  const serviceCode = getServiceCodeForName(req.params.service);
+  // Process
+  if (checkTheServiceSupport(serviceCode)) {
     responseResult(res, getAvailableRegionByService(serviceCode));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
@@ -36,7 +43,10 @@ router.get('/regions/:service', (req, res) => {
  * @description Return a list of service type of aws service for region and product type
  */
 router.get('/types/:service', (req, res) => {
-  if (checkTheServiceSupportByName(req.params.service)) {
+  // Get service code
+  const serviceCode = getServiceCodeForName(req.params.service);
+  // Process
+  if (checkTheServiceSupport(serviceCode)) {
     responseResult(res, getServiceTypes(serviceCode, req.query.region, req.query.productType));
   } else {
     responseResult(res, { code: CODE.ERROR.INVALID_SERVICE_CODE });
