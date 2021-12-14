@@ -3,7 +3,7 @@ const router = express.Router();
 // Model
 const { SERVICE } = require('../models/model');
 // Module
-const { findByService, updateData } = require('../modules/price');
+const { checkTheServiceSupport, findByService, updateData } = require('../modules/price');
 const { checkParamForRegion, responseResult } = require('../modules/middleware');
 
 /**
