@@ -26,6 +26,13 @@ module.exports = {
    * @returns {*} Return the appropriate response object according to the result of the request
    */
   responseResult: (res, result) => {
+    // Set header
+    res.set({
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+    });
+    // Reponse
     if (result.code !== CODE.SUCCESS) {
       errDbg(`Code: ${result.code}`);
       return res.json({ result: false, message: MESSAGE[result.code] });
